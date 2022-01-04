@@ -1,0 +1,4 @@
+{
+    "dockerhub-id": "s3patil/dsc-180:latest",
+    "build-script": "python run.py test"
+}
