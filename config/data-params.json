@@ -1,6 +1,6 @@
 {
-    "path": "../data/cora/",
-    "dataset": "cora",
+    "path": "./data/data/",
+    "dataset": "Spotify Playlist",
     "train": 140,
     "val": 300,
     "test": 1000,

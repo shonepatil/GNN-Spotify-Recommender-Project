@@ -10,7 +10,7 @@ sys.path.insert(0, 'src/model')
 
 from build_features import load_data
 from analysis import compute_aggregates
-from train import train_test
+# from train import train_test
 
 
 def main(targets):
