@@ -35,14 +35,28 @@ def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, includ
     # See top co-occurence pairs of songs
     # print(sorted(G.edges(data=True),key= lambda x: x[2]['weight'],reverse=True)[:5])
 
-    #See graph info
+    # See graph info
     print('Graph Info:\n', nx.info(G))
     
-    #Get the Adjacency Matrix (A) and Node Features Matrix (X) as numpy array
+    # Get the Adjacency Matrix (A) and Node Features Matrix (X) as numpy array
 
     # Include Ad-Hoc graph variables
 
     # Standardize X
+
+
+    # Dump to CSV
+
+    # # list of name, degree, score 
+    # nodes = G.nodes
+        
+    # # dictionary of lists  
+    # dic = {'track_uri': nodes}  
+        
+    # df = pd.DataFrame(dic)
+        
+    # # saving the dataframe 
+    # df.to_csv('170k_songs.csv') 
 
 # Create graph nodes and edges
 def create_nodes_edges(G, playlists):
@@ -55,7 +69,6 @@ def create_nodes_edges(G, playlists):
 
         for i in range(len(tracks)): # create nodes
             first = tracks[i]['track_uri'][14:]
-            G.add_node(first, name=first)
 
             for j in range(i + 1, len(tracks)):
                 second = tracks[j]['track_uri'][14:]
