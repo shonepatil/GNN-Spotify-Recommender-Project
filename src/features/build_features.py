@@ -6,6 +6,7 @@ import numpy as np
 import os
 import json
 from sklearn.preprocessing import StandardScaler
+from fastnode2vec import Graph, Node2Vec
 
 import sys
 sys.path.insert(0, 'src/model')
@@ -19,7 +20,6 @@ def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, includ
     G = nx.Graph(name = 'G')
     
     # Load data
-
     # Choose how many playlists to load in
     n = 10000
     count = 0
@@ -37,26 +37,40 @@ def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, includ
 
     # See graph info
     print('Graph Info:\n', nx.info(G))
+    # A = nx.to_scipy_sparse_matrix(G)
     
-    # Get the Adjacency Matrix (A) and Node Features Matrix (X) as numpy array
+    # Get Node Features Matrix (X)
+    X_start = pd.read_csv('./data/a13group1/features/merged_features.csv')
+    uris = [i[14:] for i in X_start['track_uri']]
+    X = X_start.iloc[:, 2:].drop(['type'], axis=1).values
 
-    # Include Ad-Hoc graph variables
+    # Set up Node2Vec Embeddings
+    if include_node2vec:
+        g = []
+        for edge in nx.convert.to_edgelist(G):
+            last = (edge[0], edge[1], edge[2]['weight'])
+            g.append(last)
+
+        graph = Graph(g, directed=False, weighted=True)
+        n2v = Node2Vec(graph, dim=32, walk_length=10, context=10, p=2.0, q=0.5, workers=4, seed=10)
+        n2v.train(epochs=200, progress_bar=True)
+        emb = [n2v.wv[node] for node in uris]
+        X = np.c_[X, np.array(emb)].astype(float)
 
     # Standardize X
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+    # X = torch.FloatTensor(X)
 
+    # Show stats
+    print('\nShape of X: ', X.shape)
+    print('\nNode Features Matrix (X):\n', X)
 
-    # Dump to CSV
+    # Dump to csv
+    X_df = pd.DataFrame(X)
+    X_df['track_uri'] = uris
+    X_df.to_csv('./data/node2vec_merged_features.csv')
 
-    # # list of name, degree, score 
-    # nodes = G.nodes
-        
-    # # dictionary of lists  
-    # dic = {'track_uri': nodes}  
-        
-    # df = pd.DataFrame(dic)
-        
-    # # saving the dataframe 
-    # df.to_csv('170k_songs.csv') 
 
 # Create graph nodes and edges
 def create_nodes_edges(G, playlists):
