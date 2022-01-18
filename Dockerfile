@@ -26,7 +26,7 @@ USER jovyan
 
 # RUN conda install -y scikit-learn
 
-RUN pip install --no-cache-dir node2vec pyvis
+RUN pip install --no-cache-dir node2vec pyvis fastnode2vec
 
 # Override command to disable running jupyter notebook at launch
 # CMD ["/bin/bash"]

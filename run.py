@@ -10,7 +10,7 @@ sys.path.insert(0, 'src/model')
 
 from build_features import load_data
 from analysis import compute_aggregates
-# from train import train_test
+from train import train_test
 
 
 def main(targets):
@@ -26,7 +26,7 @@ def main(targets):
             data_cfg = json.load(fh)
 
         # make the data target
-        data = load_data(**data_cfg)
+        X_train, X_test, y_train, y_test = load_data(**data_cfg)
 
     if 'analysis' in targets:
         with open('config/analysis-params.json') as fh:
@@ -40,7 +40,7 @@ def main(targets):
             model_cfg = json.load(fh)
 
         # make the model target
-        train_test(data, **model_cfg)
+        train_test(X_train, X_test, y_train, y_test, **model_cfg)
 
     if 'test' in targets:
         with open('config/test-params.json') as fh:

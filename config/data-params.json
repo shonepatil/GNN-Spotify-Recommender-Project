@@ -1,9 +1,9 @@
 {
     "path": "./data/a13group1/data/",
     "dataset": "Spotify Playlist",
-    "train": 140,
+    "train": 0.75,
     "val": 300,
-    "test": 1000,
-    "include_ad_hoc_feat": false,
-    "include_node2vec": true
+    "test": 0.25,
+    "node2vec_from_scratch": false,
+    "graph_from_scratch": false
 }
