@@ -8,8 +8,7 @@ import json
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from fastnode2vec import Graph, Node2Vec
-from itertools import combinations, islice
-import random
+from collections import defaultdict
 
 import sys
 sys.path.insert(0, 'src/model')
@@ -27,6 +26,16 @@ def load_data(path, dataset, train, val, test, node2vec_from_scratch=False, grap
         print('Loading graph from file')
         G = nx.read_edgelist("./data/a13group1/node2vec_features/170k_edgelist.csv", nodetype=str, data=(("weight", int),))
 
+    # n_G = nx.relabel.convert_node_labels_to_integers(G, ordering='sorted')
+    int_to_label = dict(zip(np.arange(0, G.number_of_nodes()), sorted(G.nodes())))
+    label_to_int = dict(zip(sorted(G.nodes()), np.arange(0, G.number_of_nodes())))
+
+    adj_list = defaultdict(set)    
+    for e in G.edges:
+        u,v = label_to_int[e[0]], label_to_int[e[1]]
+        adj_list[u].add(v)
+        adj_list[v].add(u)
+
     # See graph info
     print('Graph Info:\n', nx.info(G))
 
@@ -38,50 +47,14 @@ def load_data(path, dataset, train, val, test, node2vec_from_scratch=False, grap
         print('Loading node2vec features from file')
         n2v_features = pd.read_csv('./data/a13group1/node2vec_features/node2vec_merged_features.csv', index_col='track_uri')\
             .drop(['Unnamed: 0'], axis=1)
-    n2v_features = n2v_features.T.to_dict('list')
-
-    # get node pairs which don't have an edge
-    print('Creating negative edges')
-    non_existing_edges = set()
-    i = 0
-    while i < (G.number_of_edges() // 3):
-        u, v = random.sample(G.nodes(), 2)
-        
-        if not G.has_edge(u, v) and not G.has_edge(v, u) and (u, v) not in non_existing_edges:
-            non_existing_edges.add((u, v))
-            i += 1
-
-    non_existing_edges = list(non_existing_edges)
-
-    df1 = pd.DataFrame(data = non_existing_edges, columns =['Node 1', 'Node 2'])
- 
-    # create a column 'Connection' with default 0 (no-connection)
-    df1['Connection'] = 0
     
-        # get node pairs in fb dataframe with indices in removable_edges_indices
-    df2 = pd.DataFrame(data = list(G.edges), columns =['Node 1', 'Node 2'])
-    
-    # create a column 'Connection' and assign default value of 1 (connected nodes)
-    df2['Connection'] = 1
+    # Create X to be indexed by ints
+    X = n2v_features.reset_index().drop(['track_uri'], axis=1).values
 
-    total = df1.append(df2[['Node 1', 'Node 2', 'Connection']],
-                ignore_index=True)
+    print('Features X:\n', X)
+    print('Features X Shape:\n', X.shape)
 
-    print(total.head())
-
-    y = total['Connection']
-
-    X = np.array([(n2v_features[i]+n2v_features[j]) for i,j in zip(total['Node 1'], total['Node 2'])])
-
-    print(len(y))
-    print(len(X))
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = train, test_size = test, random_state = 0)
-
-    print(len(X_train))
-    print(len(X_test))
-
-    return X_train, X_test, y_train, y_test
+    return X, adj_list, int_to_label
 
 
 # Create graph from raw data

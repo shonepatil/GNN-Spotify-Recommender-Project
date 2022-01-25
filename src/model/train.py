@@ -1,20 +1,21 @@
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from sklearn.metrics import f1_score, auc, roc_curve, roc_auc_score,confusion_matrix
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
 
-def train_test(X_train, X_test, y_train, y_test):
+def train_test(X, adj_list, int_to_label):
 
-    #classifier
-    clf1 = RandomForestClassifier(n_estimators = 20, max_depth = 10)
-    
-    print('Starting training')
-    
-    # alternative metric to optimize over grid parameters: AUC
-    clf1.fit(X_train, y_train)
-    predict_proba = clf1.predict_proba(X_test)[:,1]
-    
-    print('Test set AUC: ', roc_auc_score(y_test, predict_proba))
+    print('Running KNN on node2vec embeddings')
+    n = 20
+
+    nbrs = NearestNeighbors(n_neighbors=n + 1, algorithm='ball_tree').fit(X)
+    distances, indices = nbrs.kneighbors(X)
+
+    print('Calculate recommender accuracy')
+    accuracies = 0
+    for i in range(len(indices)):
+        node = indices[i]
+        sim = set(node[1:])
+        inter = sim.intersection(adj_list[i])
+        accuracies += (len(inter) / min(n, len(adj_list[i])))
+
+    print('Average Accuracy: ', accuracies / len(indices))
+        

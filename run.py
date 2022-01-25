@@ -26,7 +26,7 @@ def main(targets):
             data_cfg = json.load(fh)
 
         # make the data target
-        X_train, X_test, y_train, y_test = load_data(**data_cfg)
+        X, adj_list, int_to_label = load_data(**data_cfg)
 
     if 'analysis' in targets:
         with open('config/analysis-params.json') as fh:
@@ -40,7 +40,7 @@ def main(targets):
             model_cfg = json.load(fh)
 
         # make the model target
-        train_test(X_train, X_test, y_train, y_test, **model_cfg)
+        train_test(X, adj_list, int_to_label, **model_cfg)
 
     if 'test' in targets:
         with open('config/test-params.json') as fh:
