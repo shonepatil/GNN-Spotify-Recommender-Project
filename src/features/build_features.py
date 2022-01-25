@@ -41,6 +41,7 @@ def load_data(path, dataset, train, val, test, node2vec_from_scratch=False, grap
 
     # Load node2vec features
     if node2vec_from_scratch:
+        print('Creating node2vec embeddings')
         n2v_features = create_node2vec_embeddings(G)
     else:
         # Load from file
@@ -113,7 +114,7 @@ def create_node2vec_embeddings(G):
     # Dump to csv
     X_df = pd.DataFrame(X)
     X_df['track_uri'] = uris
-    X_df.to_csv('./data/node2vec_merged_features.csv')
+    X_df.to_csv('./data/node2vec_merged_features_new.csv')
 
     return X_df
 

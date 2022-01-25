@@ -4,7 +4,7 @@ import numpy as np
 def train_test(X, adj_list, int_to_label):
 
     print('Running KNN on node2vec embeddings')
-    n = 20
+    n = 500
 
     nbrs = NearestNeighbors(n_neighbors=n + 1, algorithm='ball_tree').fit(X)
     distances, indices = nbrs.kneighbors(X)
