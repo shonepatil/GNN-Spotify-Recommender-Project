@@ -4,18 +4,22 @@ import numpy as np
 def train_test(X, adj_list, int_to_label):
 
     print('Running KNN on node2vec embeddings')
-    n = 500
+    n = 1000
 
     nbrs = NearestNeighbors(n_neighbors=n + 1, algorithm='ball_tree').fit(X)
     distances, indices = nbrs.kneighbors(X)
 
-    print('Calculate recommender accuracy')
-    accuracies = 0
+    print('Calculate recommender precision and recall')
+    precision = 0
+    recall = 0
     for i in range(len(indices)):
         node = indices[i]
-        sim = set(node[1:])
+        size = min(n, len(adj_list[i]))
+        sim = set(node[1:size + 1])
         inter = sim.intersection(adj_list[i])
-        accuracies += (len(inter) / min(n, len(adj_list[i])))
+        precision += (len(inter) / len(sim))
+        recall += (len(inter) / size)
 
-    print('Average Accuracy: ', accuracies / len(indices))
+    print('Average Precision: ', precision / len(indices))
+    print('Average Recall: ', recall / len(indices))
         
