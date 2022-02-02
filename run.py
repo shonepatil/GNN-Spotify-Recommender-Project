@@ -4,13 +4,10 @@ import sys
 import json
 
 sys.path.insert(0, 'src/data')
-sys.path.insert(0, 'src/analysis')
-sys.path.insert(0, 'src/features')
-sys.path.insert(0, 'src/model')
+sys.path.insert(0, 'src/dgl_graphsage')
 
-from build_features import load_data
-from analysis import compute_aggregates
-# from train import train_test
+from utils import load_data
+from train import train
 
 
 def main(targets):
@@ -26,7 +23,7 @@ def main(targets):
             data_cfg = json.load(fh)
 
         # make the data target
-        data = load_data(**data_cfg)
+        feat_data, adj_list, dgl_G = load_data(**data_cfg)
 
     if 'analysis' in targets:
         with open('config/analysis-params.json') as fh:
@@ -38,9 +35,9 @@ def main(targets):
     if 'model' in targets:
         with open('config/model-params.json') as fh:
             model_cfg = json.load(fh)
-
+    
         # make the model target
-        train_test(data, **model_cfg)
+        train(dgl_G, feat_data, adj_list, **model_cfg)
 
     if 'test' in targets:
         with open('config/test-params.json') as fh:

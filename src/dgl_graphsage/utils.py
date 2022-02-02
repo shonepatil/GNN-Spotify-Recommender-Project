@@ -6,11 +6,16 @@ from sklearn.metrics import roc_auc_score
 from torch.nn.functional import normalize
 import torch
 import dgl
+import networkx as nx
 
-def load_data(G, feat_dir, normalize=True):
+def load_data(feat_dir, graph_dir, normal=True):
+    print('Loading graph data...')
+    G = nx.read_gpickle(graph_dir)
+
+    print('Loading feature data...')
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
     features = np.array(np.delete(data[:,2:], -3, 1), dtype=float)
-    if normalize:
+    if normal:
         features = normalize(torch.Tensor(features), dim=0)
     uris = data[:, 1]
     uris = [re.sub('spotify:track:', '', uri) for uri in uris]
@@ -26,7 +31,6 @@ def load_data(G, feat_dir, normalize=True):
         dest.append(v)
     
     dgl_G = dgl.graph((src, dest), num_nodes=len(G.nodes))
-    
     return features, adj_list, dgl_G
 
 def adj_matrix(adj_list):
@@ -48,9 +52,11 @@ def make_label(batch_nodes, adj_list):
     
     return mask
 
-def compute_loss(pos_score, neg_score):
+def compute_loss(pos_score, neg_score, cuda):
     scores = torch.cat([pos_score, neg_score])
     labels = torch.cat([torch.ones(pos_score.shape[0]), torch.zeros(neg_score.shape[0])])
+    if cuda:
+        labels = labels.to('cuda:0')
     return F.binary_cross_entropy_with_logits(scores, labels)
 
 def compute_auc(pos_score, neg_score):

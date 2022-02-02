@@ -1,8 +1,4 @@
 {
-    "path": "./data/data/",
-    "dataset": "Spotify Playlist",
-    "train": 140,
-    "val": 300,
-    "test": 1000,
-    "include_ad_hoc_feat": false
+    "feat_dir": "./data/a13group1/features/merged_features.csv",
+    "graph_dir": "./data/a13group1/graph_170k.gpickle"
 }
