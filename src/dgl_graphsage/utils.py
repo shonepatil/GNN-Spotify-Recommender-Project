@@ -7,10 +7,15 @@ from torch.nn.functional import normalize
 import torch
 import dgl
 import networkx as nx
+from build_features import load_data
 
-def load_data(feat_dir, graph_dir, normal=True):
+def get_gpickle(data_path, dataset, pickle_path):
+    G = load_data(path, dataset, 0, 0, 0)
+    nx.write_gpickle(G, pickle_path)
+
+def load_data(feat_dir, gpickle_dir, normal=True):
     print('Loading graph data...')
-    G = nx.read_gpickle(graph_dir)
+    G = nx.read_gpickle(gpickle_dir)
 
     print('Loading feature data...')
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
