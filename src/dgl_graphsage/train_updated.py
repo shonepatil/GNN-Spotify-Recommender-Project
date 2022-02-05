@@ -8,6 +8,15 @@ import itertools
 import time
 from utils import compute_loss, compute_auc
 
+from dgl.dataloading import negative_sampler
+
+def eid_neg_sampling(G, neg_sampler):
+    s, d = G.all_edges(form='uv', order='srcdst')
+    unique_idx = np.unique(s, return_index=True)[1] #index of unique nodes
+    s, d = s[unique_idx], d[unique_idx]
+    sample_eids = G.edge_ids(s, d)  
+    return neg_sampler(G, sample_eids)
+
 def train(feat_dim, emb_dim, G, features, k=5):
     np.random.seed(1)
     neg_sampler = dgl.dataloading.negative_sampler.Uniform(k)
@@ -30,9 +39,18 @@ def train(feat_dim, emb_dim, G, features, k=5):
     #Construct train and validation graph
     train_g = dgl.node_subgraph(G, train)
     val_g = dgl.node_subgraph(G, val)
+    
     #Construct neg validation graph
-    val_s_neg, val_d_neg = neg_sampler(val_g, val_g.nodes())
+    #For each unique src node s in validation graph, sample a dest node d and get the eid of (s,d) 
+    #to pass in neg_sampler
+    #5 negative dest node for each unique node in graph
+    val_s, val_d = val_g.all_edges(form='uv', order='srcdst')
+    unique_idx = np.unique(val_s, return_index=True)[1] #index of unique nodes
+    val_s, val_d = val_s[unique_idx], val_d[unique_idx]
+    sample_eids = val_g.edge_ids(val_s, val_d)  
+    val_s_neg, val_d_neg = neg_sampler(val_g, sample_eids)
     val_neg_g = dgl.graph((val_s_neg, val_d_neg), num_nodes=val_g.number_of_nodes())
+    
     print('Train pos edge: {}'.format(train_g.number_of_edges()))
     print('Validation pos edge: {}'.format(val_g.number_of_edges()))
     print()
@@ -43,15 +61,19 @@ def train(feat_dim, emb_dim, G, features, k=5):
     batch_per_epoch = len(train) // 3000
     for epoch in range(10):
         for batch in range(batch_per_epoch):
-            batch_nodes = torch.randperm(len(train))  
+            #randomly sample batch size nodes from train graph
+            batch_nodes = torch.randperm(len(train))[:3000]  
             start_time = time.time()
             #Use original node ids to extract features for train graph
             embed = model(train_g, features[train_g.ndata[dgl.NID]]) 
 
             #construct pos and neg graph for batch
-            src, dest = train_g.out_edges(batch_nodes, form='uv')
-            src_neg, dest_neg = neg_sampler(train_g, train_g.nodes()) 
+            src, dest = train_g.out_edges(batch_nodes, form='uv') 
             train_pos_g = dgl.graph((src, dest), num_nodes=train_g.number_of_nodes())
+            
+            unique_idx = np.unique(src, return_index=True)[1] #index of unique nodes
+            sample_eids = train_g.edge_ids(src[unique_idx], dest[unique_idx])  
+            src_neg, dest_neg = neg_sampler(train_g, sample_eids)
             train_neg_g = dgl.graph((src_neg, dest_neg), num_nodes=train_g.number_of_nodes())
 
             pos_score = pred(train_pos_g, embed)
