@@ -1,4 +1,4 @@
 {
-    "dockerhub-id": "s3patil/dsc-180:latest",
-    "build-script": "python run.py test"
+    "GitHub Repository": "https://github.com/shonepatil/GNN-Spotify-Recommender-Project",
+    "DockerHub Repository": "https://hub.docker.com/r/s3patil/dsc-180"
 }

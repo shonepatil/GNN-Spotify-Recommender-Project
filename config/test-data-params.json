@@ -1,0 +1,5 @@
+{
+    "feat_dir": "./test/testdata/test_features.csv",
+    "gpickle_dir": "./test/testdata/test_graph.gpickle",
+    "create_graph_from_scratch": false
+}

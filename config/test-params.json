@@ -1,8 +1,0 @@
-{
-    "path": "../../test/testdata/",
-    "dataset": "test",
-    "train": 10,
-    "val": 20,
-    "test": 20,
-    "include_ad_hoc_feat": false
-}

@@ -7,10 +7,6 @@ import os
 import json
 from sklearn.preprocessing import StandardScaler
 
-import sys
-sys.path.insert(0, 'src/model')
-from src.model.utils import encode_onehot, frac_mat_power
-
 def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, include_node2vec=False):
     """Load network dataset"""
     print('Loading {} dataset...'.format(dataset))
@@ -57,6 +53,7 @@ def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, includ
         
     # # saving the dataframe 
     # df.to_csv('170k_songs.csv') 
+    return G
 
 # Create graph nodes and edges
 def create_nodes_edges(G, playlists):
@@ -84,3 +81,22 @@ def create_nodes_edges(G, playlists):
                         count += 1
 
     return count
+
+def encode_onehot(labels):
+    classes = set(labels)
+    classes_dict = {c: np.identity(len(classes))[i, :] for i, c in
+                    enumerate(classes)}
+    labels_onehot = np.array(list(map(classes_dict.get, labels)),
+                             dtype=np.int32)
+    return labels_onehot
+
+def frac_mat_power(m, n):
+    evals, evecs = torch.eig (m, eigenvectors = True)  # get eigendecomposition
+    evals = evals[:, 0]                                # get real part of (real) eigenvalues
+    # rebuild original matrix
+    mchk = torch.matmul (evecs, torch.matmul (torch.diag (evals), torch.inverse (evecs)))
+    mchk - m                                           # check decomposition
+    evpow = evals**(n)                              # raise eigenvalues to fractional power
+    # build exponentiated matrix from exponentiated eigenvalues
+    mpow = torch.matmul (evecs, torch.matmul (torch.diag (evpow), torch.inverse (evecs)))
+    return mpow

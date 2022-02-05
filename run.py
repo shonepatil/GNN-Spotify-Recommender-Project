@@ -7,7 +7,7 @@ sys.path.insert(0, 'src/data')
 sys.path.insert(0, 'src/dgl_graphsage')
 
 from utils import load_data
-from train import train
+from train_updated import train
 
 
 def main(targets):
@@ -40,16 +40,16 @@ def main(targets):
         train(dgl_G, feat_data, adj_list, **model_cfg)
 
     if 'test' in targets:
-        with open('config/test-params.json') as fh:
+        with open('config/test-data-params.json') as fh:
             data_cfg = json.load(fh)
-        with open('config/model-params.json') as fh:
+        with open('config/test-model-params.json') as fh:
             model_cfg = json.load(fh)
 
         # load test data
-        data = load_data(**data_cfg)
+        feat_data, adj_list, dgl_G = load_data(**data_cfg)
 
         # make the test target
-        train_test(data, **model_cfg)
+        train(dgl_G, feat_data, adj_list, **model_cfg)
 
     return
 

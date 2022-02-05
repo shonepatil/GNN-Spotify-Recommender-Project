@@ -7,14 +7,21 @@ from torch.nn.functional import normalize
 import torch
 import dgl
 import networkx as nx
-from build_features import load_data
+
+import sys
+sys.path.insert(0, './src/features')
+from build_features import load_data as graph_from_scratch
 
 def get_gpickle(data_path, dataset, pickle_path):
-    G = load_data(path, dataset, 0, 0, 0)
+    G = graph_from_scratch(data_path, dataset, 0, 0, 0)
     nx.write_gpickle(G, pickle_path)
 
-def load_data(feat_dir, gpickle_dir, normal=True):
+def load_data(feat_dir, gpickle_dir, create_graph_from_scratch, normal=True):
+    
     print('Loading graph data...')
+    if create_graph_from_scratch:
+        get_gpickle('./data/playlists', 'Spotify Playlist', gpickle_dir)
+
     G = nx.read_gpickle(gpickle_dir)
 
     print('Loading feature data...')
