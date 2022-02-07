@@ -3,6 +3,7 @@ import numpy as np
 import dgl
 from graphsage import GraphSAGE
 from pred import MLPPredictor
+from pred import DotPredictor
 import torch 
 import itertools
 import time
@@ -23,7 +24,7 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
 
     model = GraphSAGE(feat_dim, emb_dim)
     pred = MLPPredictor(emb_dim)
-
+    #pred = DotPredictor()
     rand_indices = np.random.permutation(num_nodes)
     if test_data:
         test = list(rand_indices[:2])
@@ -96,7 +97,8 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
             loss.backward()
             optimizer.step()
             end_time = time.time()
-
+            
+            
             if batch % 5 == 0:
                 print('In epoch {} batch {}, loss: {}'.format(epoch+1, batch+1, loss))
         
@@ -107,8 +109,9 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
                 val_neg_g = val_neg_g.to('cuda:0')
 
             z = model(val_g, features[val_g.ndata[dgl.NID]])
+            
             pos = pred(val_g, z).cpu()
             neg = pred(val_neg_g, z).cpu()
             print('Epoch {} AUC: '.format(epoch+1), compute_auc(pos, neg))
 
-    return model, pred
+    return model, pred, train, val_g, val_neg_g, embed

@@ -43,7 +43,7 @@ def load_data(feat_dir, gpickle_dir, create_graph_from_scratch, normal=True):
         dest.append(v)
     
     dgl_G = dgl.graph((src, dest), num_nodes=len(G.nodes))
-    return features, adj_list, dgl_G
+    return features, adj_list, dgl_G, uri_map
 
 def adj_matrix(adj_list):
     row_idx = torch.LongTensor([k for k in range(len(adj_list.keys())) for v in range(len(adj_list[k]))])
