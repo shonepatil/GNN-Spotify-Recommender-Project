@@ -114,4 +114,4 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
             neg = pred(val_neg_g, z).cpu()
             print('Epoch {} AUC: '.format(epoch+1), compute_auc(pos, neg))
 
-    return model, pred, train, val_g, val_neg_g, embed
+    return model, pred
