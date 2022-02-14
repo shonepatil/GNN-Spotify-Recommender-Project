@@ -44,12 +44,10 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
     #For each unique src node s in validation graph, sample a dest node d and get the eid of (s,d) 
     #to pass in neg_sampler
     #5 negative dest node for each unique node in graph
-    val_s, val_d = val_g.all_edges(form='uv', order='srcdst')
-    unique_idx = np.unique(val_s, return_index=True)[1] #index of unique nodes
-    val_s, val_d = val_s[unique_idx], val_d[unique_idx]
-    sample_eids = val_g.edge_ids(val_s, val_d)  
-    val_s_neg, val_d_neg = neg_sampler(val_g, sample_eids)
+    val_s_neg, val_d_neg = eid_neg_sampling(val_g, neg_sampler)
+    val_s_neg, val_d_neg = torch.cat([val_s_neg, val_d_neg]), torch.cat([val_d_neg, val_s_neg])
     val_neg_g = dgl.graph((val_s_neg, val_d_neg), num_nodes=val_g.number_of_nodes())
+    
     
     print('Train pos edge: {}'.format(train_g.number_of_edges()))
     print('Validation pos edge: {}'.format(val_g.number_of_edges()))
@@ -76,19 +74,19 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
             embed = model(train_g, features[train_g.ndata[dgl.NID]]) 
 
             #construct pos and neg graph for batch
-            src, dest = train_g.out_edges(batch_nodes, form='uv') 
+            src, dest = train_g.out_edges(batch_nodes, form='uv')
+            src, dest = torch.cat([src, dest]), torch.cat([dest, src])
             train_pos_g = dgl.graph((src, dest), num_nodes=train_g.number_of_nodes())
             
-            unique_idx = np.unique(src.cpu(), return_index=True)[1] #index of unique nodes
-            sample_eids = train_g.edge_ids(src[unique_idx], dest[unique_idx])  
-            src_neg, dest_neg = neg_sampler(train_g, sample_eids)
+            src_neg, dest_neg = eid_neg_sampling(train_g, neg_sampler)
+            src_neg, dest_neg = torch.cat([src_neg, dest_neg]), torch.cat([dest_neg, src_neg])
             train_neg_g = dgl.graph((src_neg, dest_neg), num_nodes=train_g.number_of_nodes())
 
             if cuda:
                 train_pos_g = train_pos_g.to('cuda:0')
                 train_neg_g = train_neg_g.to('cuda:0')
-            pos_score = pred(train_pos_g, embed)
-            neg_score = pred(train_neg_g, embed)
+            pos_score = pred(train_pos_g, embed, edges=(src,dest))
+            neg_score = pred(train_neg_g, embed, edges=(src_neg, dest_neg))
             loss = compute_loss(pos_score, neg_score, cuda)
             losses.append(loss)
 
@@ -111,4 +109,4 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
             neg = pred(val_neg_g, z).cpu()
             print('Epoch {} AUC: '.format(epoch+1), compute_auc(pos, neg))
 
-    return model, pred
+    return model, pred, losses
