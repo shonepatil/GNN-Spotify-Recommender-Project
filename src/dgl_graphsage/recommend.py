@@ -6,9 +6,11 @@ import pandas as pd
 import os
 import numpy as np
 
-sys.path.insert(0, 'src/data')
-sys.path.insert(0, 'src/dgl_graphsage')
-from src.api.spotifyAPI import SpotifyAPI
+# sys.path.insert(0, 'src/data')
+# sys.path.insert(0, 'src/dgl_graphsage')
+
+sys.path.insert(1, '..')
+from api.spotifyAPI import SpotifyAPI
 from utils import load_data
 from train_updated import train
 
@@ -23,7 +25,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 
 sys.path.insert(0, './src/features')
-from build_features import load_data as graph_from_scratch
+from features.build_features import load_data as graph_from_scratch
 import re
 from torch.nn.functional import normalize
 
@@ -95,7 +97,7 @@ from torch.nn.functional import normalize
 Loads the double edged graph
 feat_dir = feature directory
 '''
-def load_double_edge(feat_dir, normal=True):
+def load_double_edge(feat_dir, double_edge_dir, normal=True):
     print('Loading feature data...')
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
     features = np.array(np.delete(data[:,2:], -3, 1), dtype=float)
@@ -106,7 +108,7 @@ def load_double_edge(feat_dir, normal=True):
     uri_map = {n: i for i,n in enumerate(uris)}
     listed = list(uri_map)
     
-    G  = load_graphs("./data/a13group1/double_edges_170k.bin")[0][0]
+    G  = load_graphs(double_edge_dir)[0][0]
     print('Loaded DGL Graph')
     sources = G.edges()[0] 
     destinations = G.edges()[1]

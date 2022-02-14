@@ -9,8 +9,8 @@ import dgl
 import networkx as nx
 
 import sys
-sys.path.insert(0, './src/features')
-from build_features import load_data as graph_from_scratch
+sys.path.insert(0, '..')
+from features.build_features import load_data as graph_from_scratch
 
 def get_gpickle(data_path, dataset, pickle_path):
     G = graph_from_scratch(data_path, dataset, 0, 0, 0)
