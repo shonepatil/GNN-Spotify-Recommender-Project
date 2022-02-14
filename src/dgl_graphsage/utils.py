@@ -16,34 +16,38 @@ def get_gpickle(data_path, dataset, pickle_path):
     G = graph_from_scratch(data_path, dataset, 0, 0, 0)
     nx.write_gpickle(G, pickle_path)
 
-def load_data(feat_dir, gpickle_dir, create_graph_from_scratch, normal=True):
-    
-    print('Loading graph data...')
-    if create_graph_from_scratch:
-        get_gpickle('./data/playlists', 'Spotify Playlist', gpickle_dir)
-
-    G = nx.read_gpickle(gpickle_dir)
-
-    print('Loading feature data...')
+def load_features(feat_dir, normalize=True):
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
     features = np.array(np.delete(data[:,2:], -3, 1), dtype=float)
-    if normal:
-        features = normalize(torch.Tensor(features), dim=0)
+    if normalize:
+        features = F.normalize(torch.Tensor(features), dim=0)
     uris = data[:, 1]
     uris = [re.sub('spotify:track:', '', uri) for uri in uris]
     uri_map = {n: i for i,n in enumerate(uris)}
+    
+    return features, uri_map
 
-    src, dest = [], [] 
-    adj_list = defaultdict(set)    
-    for e in G.edges:
-        u,v = uri_map[e[0]], uri_map[e[1]]
-        adj_list[u].add(v)
-        adj_list[v].add(u)
+def load_graph(G, uri_map):
+    src, dest = [], []
+    weights = []
+    for e in G.edges.data('weight'):
+        uri_u, uri_v, w = e
+        u, v = uri_map[uri_u], uri_map[uri_v]
         src.append(u)
         dest.append(v)
-    
+        w = G[uri_u][uri_v]['weight']
+        weights.append(w)
+  
+    #make double edges
+    src, dest = torch.tensor(src), torch.tensor(dest)
+    src, dest = torch.cat([src, dest]), torch.cat([dest, src])
     dgl_G = dgl.graph((src, dest), num_nodes=len(G.nodes))
-    return features, adj_list, dgl_G
+    
+    #store edge weights in graph
+    weights = torch.FloatTensor(weights+weights)
+    dgl_G.edata['weights'] = weights
+    
+    return dgl_G, weights
 
 def adj_matrix(adj_list):
     row_idx = torch.LongTensor([k for k in range(len(adj_list.keys())) for v in range(len(adj_list[k]))])
