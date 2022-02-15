@@ -15,7 +15,7 @@ def eid_neg_sampling(G, neg_sampler):
     sample_eids = G.edge_ids(s, d)  
     return neg_sampler(G, sample_eids)
 
-def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
+def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
     np.random.seed(1)
     neg_sampler = dgl.dataloading.negative_sampler.Uniform(k)
     num_nodes = G.number_of_nodes()
@@ -71,7 +71,7 @@ def train(G, features, adj_list, cuda, feat_dim, emb_dim, test_data, k=5):
                 batch_nodes = batch_nodes.to('cuda:0')
             start_time = time.time()
             #Use original node ids to extract features for train graph
-            embed = model(train_g, features[train_g.ndata[dgl.NID]]) 
+            embed = model(train_g, features[train_g.ndata[dgl.NID]], weights) 
 
             #construct pos and neg graph for batch
             src, dest = train_g.out_edges(batch_nodes, form='uv')
