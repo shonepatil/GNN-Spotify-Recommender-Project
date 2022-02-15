@@ -7,6 +7,7 @@ import torch
 import itertools
 import time
 from utils import compute_loss, compute_auc
+from sklearn.metrics import classification_report, roc_auc_score
 
 def eid_neg_sampling(G, neg_sampler):
     s, d = G.all_edges(form='uv', order='srcdst')
@@ -105,8 +106,14 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
                 val_neg_g = val_neg_g.to('cuda:0')
 
             z = model(val_g, features[val_g.ndata[dgl.NID]])
-            pos = pred(val_g, z).cpu()
-            neg = pred(val_neg_g, z).cpu()
-            print('Epoch {} AUC: '.format(epoch+1), compute_auc(pos, neg))
+            pos = pred(val_g, z)
+            neg = pred(val_neg_g, z)
+        
+            scores = torch.cat([pos, neg])
+            labels = torch.cat(
+                [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
+            prediction = scores >= 0
+            print(classification_report(labels, prediction))
+            print('Epoch {} AUC: '.format(epoch+1), roc_auc_score(labels, scores, average='weighted'))
 
     return model, pred, losses
