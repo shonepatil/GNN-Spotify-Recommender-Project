@@ -12,7 +12,7 @@ class DotPredictor(nn.Module):
             g.apply_edges(fn.u_dot_v('h', 'h', 'score'))
             # u_dot_v returns a 1-element vector for each edge so you need to squeeze it.
             return g.edata['score'][:, 0]
-
+        
 class MLPPredictor(nn.Module):
     def __init__(self, h_feats):
         super().__init__()
@@ -38,9 +38,12 @@ class MLPPredictor(nn.Module):
         """
         h = torch.cat([edges.src['h'], edges.dst['h']], 1)
         return {'score': self.W2(F.relu(self.W1(h))).squeeze(1)}
-
-    def forward(self, g, h):
+    
+    def forward(self, g, h, edges='__ALL__'):
         with g.local_scope():
             g.ndata['h'] = h
-            g.apply_edges(self.apply_edges)
+            if edges != '__ALL__':
+                g.apply_edges(self.apply_edges, edges=edges)
+            else: 
+                g.apply_edges(self.apply_edges)
             return g.edata['score']
