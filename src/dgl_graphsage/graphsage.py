@@ -1,6 +1,7 @@
 from dgl.nn import SAGEConv
 import torch.nn as nn
 import torch.nn.functional as F
+import dgl
 
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):

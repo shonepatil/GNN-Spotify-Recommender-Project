@@ -1,5 +1,5 @@
 {
-    "feat_dir": "./data/a13group1/features/merged_features.csv",
+    "feat_dir": "./data/a13group1/features/songset_features.csv",
     "gpickle_dir": "./data/a13group1/graph_170k.gpickle",
     "create_graph_from_scratch": false
 }

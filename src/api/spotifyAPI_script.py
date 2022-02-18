@@ -10,8 +10,8 @@ import json
 import time
 import spotifyAPI as spot
 
-client_id = ''
-client_secret = ''
+client_id = None
+client_secret = None
 
 spotify = spot.SpotifyAPI(client_id, client_secret)
 
@@ -19,19 +19,20 @@ def get_data(query, api, num):
     chunk = api.get_resource(query, 'audio-features', 'v1')
     json_object = json.dumps(chunk, indent = 4)
 
-    with open(f'C:/Users/Administrator/data/spotify_scrape/songset{num}.json', 'w') as outfile:
+    with open(f'/home/s3patil/DSC 180/GraphSage/GNN-Spotify-Recommender-Project/spotify_scrape/songset{num}.json', 'w') as outfile:
         outfile.write(json_object)
 
-ids_list = np.array(pd.read_csv('C:/Users/Administrator/data/170k_songs.csv')['track_uri'])
-splitted_first_half = (np.array_split(ids_list[:170000], 1700))
-splitted_second_half = list(ids_list[170000:])
+# 461880 songs 106486690 edges
+ids_list = np.array(pd.read_csv('460k_songs.csv')['track_uri'])
+splitted_first_half = (np.array_split(ids_list[:461800], 4618))
+splitted_second_half = list(ids_list[461800:])
 bruh = list(splitted_first_half)
 bruh.append(splitted_second_half)
 
 def perform():
     tracker = 0
-    for i in bruh:
-        qry = ','.join(i)
+    for i in range(0, len(bruh)):
+        qry = ','.join(bruh[i])
         complete = False
         while complete != True:
             try:
@@ -46,4 +47,5 @@ def perform():
             print(tracker)
         time.sleep(10)
 
-#perform()
+perform()
+print('Done pulling all song data from Spotify API!')

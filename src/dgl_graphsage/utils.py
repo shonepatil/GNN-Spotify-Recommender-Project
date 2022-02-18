@@ -17,17 +17,27 @@ def get_gpickle(data_path, dataset, pickle_path):
     nx.write_gpickle(G, pickle_path)
 
 def load_features(feat_dir, normalize=True):
+    print('Loading feature data...')
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
-    features = np.array(np.delete(data[:,2:], -3, 1), dtype=float)
+    data = data[np.argsort(data[:, 13])]
+    features = np.array(np.delete(data[:,1:], [11, 12, 13, 14, 15], 1), dtype=float)
     if normalize:
         features = F.normalize(torch.Tensor(features), dim=0)
-    uris = data[:, 1]
+    uris = data[:, 14]
     uris = [re.sub('spotify:track:', '', uri) for uri in uris]
     uri_map = {n: i for i,n in enumerate(uris)}
-    
+    print('Feature data shape: ' + str(features.shape))
+
     return features, uri_map
 
-def load_graph(G, uri_map):
+def load_graph(gpickle_dir, create_graph_from_scratch, uri_map):
+    print('Loading graph data...')
+    if create_graph_from_scratch:
+        get_gpickle('./data/playlists', 'Spotify Playlist', gpickle_dir)
+
+    G = nx.read_gpickle(gpickle_dir)
+    print('Graph Info:\n', nx.info(G))
+
     src, dest = [], []
     weights = []
     for e in G.edges.data('weight'):

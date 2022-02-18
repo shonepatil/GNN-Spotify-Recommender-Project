@@ -11,7 +11,7 @@ from sklearn.metrics import classification_report, roc_auc_score
 
 def eid_neg_sampling(G, neg_sampler):
     s, d = G.all_edges(form='uv', order='srcdst')
-    unique_idx = np.unique(s, return_index=True)[1] #index of unique nodes
+    unique_idx = torch.tensor([(s==n).nonzero(as_tuple=True)[0][0].item() for n in torch.unique(s)]) #index of unique nodes
     s, d = s[unique_idx], d[unique_idx]
     sample_eids = G.edge_ids(s, d)  
     return neg_sampler(G, sample_eids)
@@ -58,6 +58,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
         pred = pred.to('cuda:0')
         features = features.to('cuda:0')
         train_g = train_g.to('cuda:0')
+        weights = weights.to('cuda:0')
     print()
     print('Training starts:')
 
@@ -72,7 +73,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
                 batch_nodes = batch_nodes.to('cuda:0')
             start_time = time.time()
             #Use original node ids to extract features for train graph
-            embed = model(train_g, features[train_g.ndata[dgl.NID]], weights) 
+            embed = model(train_g, features[train_g.ndata[dgl.NID]], weights)
 
             #construct pos and neg graph for batch
             src, dest = train_g.out_edges(batch_nodes, form='uv')
@@ -105,7 +106,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
                 val_g = val_g.to('cuda:0')
                 val_neg_g = val_neg_g.to('cuda:0')
 
-            z = model(val_g, features[val_g.ndata[dgl.NID]])
+            z = model(val_g, features[val_g.ndata[dgl.NID]], weights)
             pos = pred(val_g, z)
             neg = pred(val_neg_g, z)
         
@@ -113,7 +114,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
             labels = torch.cat(
                 [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
             prediction = scores >= 0
-            print(classification_report(labels, prediction))
+            print(classification_report(labels, prediction, zero_division=1))
             print('Epoch {} AUC: '.format(epoch+1), roc_auc_score(labels, scores, average='weighted'))
 
     return model, pred, losses
