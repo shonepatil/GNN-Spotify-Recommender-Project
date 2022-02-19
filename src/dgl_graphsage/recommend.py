@@ -133,6 +133,7 @@ thelist: list of directories
 def get_eligible(thelist):
     eligible = []
     for x in thelist:
+        if x == 'playlists':continue
         nums = pd.Series(x.strip('mpd.slice.json').split('-')).astype(int)
         if nums[0] <= 9999:
             eligible.append(x)
@@ -229,16 +230,46 @@ def get_data_spotify(query, api, num):
     return chunk
 
 def get_rec_names(uri_recs, api, sleep_time):
+    unique_recs, unique_recs_counts = np.unique(uri_recs, return_counts=True)
+    rec_count = dict(zip(unique_recs, unique_recs_counts))
+
+    splitted = []
+    sub_splitted = []
+    counter = 0
+    all_counter = 0
+    for i in unique_recs:
+        if counter != 50:
+            sub_splitted.append(i)
+            counter += 1
+        elif all_counter == len(unique_recs):
+            sub_splitted.append(i)
+            splitted.append(sub_splitted)
+            break
+        else:
+            splitted.append(sub_splitted)
+            sub_splitted = []
+            counter = 0
+            sub_splitted.append(i)
+
+        all_counter += 1
+
+    if len(splitted) == 0:
+        splitted.append(sub_splitted)
+    
     rec_track_names = []
-    for i in uri_recs:
-        one = get_data_spotify(i, api, 1)
-        trackname = one['tracks'][0]['name']
+    for part in splitted:
+        part = str(part).replace("'", "").strip('[]').replace(' ', '')
+        one = get_data_spotify(part, api, 1)
+        
+        for each in one['tracks']:
+            
+            trackname = each['name']
+            firstartist = each['artists'][0]['name']
 
-        firstartist = one['tracks'][0]['artists'][0]['name']
-
-        the_rec = trackname+'---'+firstartist
-        rec_track_names.append(the_rec)
+            the_rec = trackname+'---'+firstartist
+            rec_track_names.append((the_rec, rec_count[each['id']]))
 
 
-        time.sleep(sleep_time)
+        time.sleep(2)
+        
     return rec_track_names
