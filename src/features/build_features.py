@@ -7,9 +7,9 @@ import os
 import json
 from sklearn.preprocessing import StandardScaler
 
-def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, include_node2vec=False):
+def load_data(path, dataset_name, playlist_num):
     """Load network dataset"""
-    print('Loading {} dataset...'.format(dataset))
+    print('Loading {} dataset...'.format(dataset_name))
 
     # Construct graph
     G = nx.Graph(name = 'G')
@@ -17,7 +17,7 @@ def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, includ
     # Load data
 
     # Choose how many playlists to load in
-    n = 10000
+    n = playlist_num
     count = 0
     print('Loading {} playlists'.format(n))
     for i in range(999, n, 1000):
@@ -33,26 +33,20 @@ def load_data(path, dataset, train, val, test, include_ad_hoc_feat=False, includ
 
     # See graph info
     print('Graph Info:\n', nx.info(G))
-    
-    # Get the Adjacency Matrix (A) and Node Features Matrix (X) as numpy array
-
-    # Include Ad-Hoc graph variables
-
-    # Standardize X
-
 
     # Dump to CSV
 
-    # # list of name, degree, score 
-    # nodes = G.nodes
+    # list of name, degree, score 
+    nodes = G.nodes
         
-    # # dictionary of lists  
-    # dic = {'track_uri': nodes}  
+    # dictionary of lists  
+    dic = {'track_uri': nodes}  
         
-    # df = pd.DataFrame(dic)
+    df = pd.DataFrame(dic)
         
-    # # saving the dataframe 
-    # df.to_csv('170k_songs.csv') 
+    # saving the dataframe 
+    df.to_csv('./data/songs.csv') 
+
     return G
 
 # Create graph nodes and edges

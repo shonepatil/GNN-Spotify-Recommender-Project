@@ -12,11 +12,27 @@ import sys
 sys.path.insert(0, './src/features')
 from build_features import load_data as graph_from_scratch
 
-def get_gpickle(data_path, dataset, pickle_path):
-    G = graph_from_scratch(data_path, dataset, 0, 0, 0)
-    nx.write_gpickle(G, pickle_path)
+sys.path.insert(0, './src/api')
+from spotifyAPI_script import pull_audio_features
+from songset_processor import build_songset_csv
 
-def load_features(feat_dir, normalize=True):
+def get_gpickle(data_path, dataset_name, pickle_path, playlist_num):
+    G = graph_from_scratch(data_path, dataset_name, playlist_num)
+    nx.write_gpickle(G, pickle_path)
+    return G.number_of_nodes()
+
+def load_features(feat_dir, gpickle_dir, create_graph_from_scratch, playlist_num=10000, normalize=True):
+
+    if create_graph_from_scratch:
+        num_nodes = get_gpickle('./data/playlists/', 'Spotify Playlist', gpickle_dir, playlist_num)
+
+        # Run spotify API script to create features
+        print('Pulling spotify song data using SpotifyAPI')
+        pull_audio_features(num_nodes)
+
+        print('Building songset features csv')
+        build_songset_csv(feat_dir, num_nodes)
+
     print('Loading feature data...')
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
     data = data[np.argsort(data[:, 13])]
@@ -30,10 +46,8 @@ def load_features(feat_dir, normalize=True):
 
     return features, uri_map
 
-def load_graph(gpickle_dir, create_graph_from_scratch, uri_map):
+def load_graph(gpickle_dir, uri_map):
     print('Loading graph data...')
-    if create_graph_from_scratch:
-        get_gpickle('./data/playlists', 'Spotify Playlist', gpickle_dir)
 
     G = nx.read_gpickle(gpickle_dir)
     print('Graph Info:\n', nx.info(G))

@@ -32,10 +32,16 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
         train = list(rand_indices[3+2:])
         batch_size = 5
     else:
-        test = list(rand_indices[:34000])
-        val = list(rand_indices[34000:51000])
-        train = list(rand_indices[51000:])
-        batch_size = 5000
+        if num_nodes > 35000:
+            test = list(rand_indices[:34000])
+            val = list(rand_indices[34000:51000])
+            train = list(rand_indices[51000:])
+            batch_size = 5000
+        else:
+            test = list(rand_indices[:5000])
+            val = list(rand_indices[5000:12000])
+            train = list(rand_indices[12000:])
+            batch_size = 3000
     
     #Construct train and validation graph
     train_g = dgl.node_subgraph(G, train)
@@ -110,9 +116,9 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
             pos = pred(val_g, z)
             neg = pred(val_neg_g, z)
         
-            scores = torch.cat([pos, neg])
+            scores = torch.cat([pos, neg]).cpu()
             labels = torch.cat(
-                [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
+                [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])]).cpu()
             prediction = scores >= 0
             print(classification_report(labels, prediction, zero_division=1))
             print('Epoch {} AUC: '.format(epoch+1), roc_auc_score(labels, scores, average='weighted'))
