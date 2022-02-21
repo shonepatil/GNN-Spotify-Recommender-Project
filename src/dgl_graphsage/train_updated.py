@@ -75,7 +75,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=0.01)
     losses = []
     batch_per_epoch = len(train) // batch_size
-    for epoch in range(10):
+    for epoch in range(1):
         for batch in range(batch_per_epoch):
             #randomly sample batch size nodes from train graph
     
@@ -120,7 +120,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
             end_time = time.time()
             
             print('-----')
-                print('In epoch {} batch {}, loss: {}'.format(epoch+1, batch+1, loss))
+            print('In epoch {} batch {}, loss: {}'.format(epoch+1, batch+1, loss))
         
         print()
         with torch.no_grad():

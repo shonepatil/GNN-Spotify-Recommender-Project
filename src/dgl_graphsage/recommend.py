@@ -25,7 +25,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 
 sys.path.insert(0, './src/features')
-from features.build_features import load_data as graph_from_scratch
 import re
 from torch.nn.functional import normalize
 

@@ -10,11 +10,11 @@ import networkx as nx
 
 import sys
 sys.path.insert(0, './src/features')
-from build_features import load_data as graph_from_scratch
+from features.build_features import load_data as graph_from_scratch
 
 sys.path.insert(0, './src/api')
-from spotifyAPI_script import pull_audio_features
-from songset_processor import build_songset_csv
+from api.spotifyAPI_script import pull_audio_features
+from api.songset_processor import build_songset_csv
 
 def get_gpickle(data_path, dataset_name, pickle_path, playlist_num):
     G = graph_from_scratch(data_path, dataset_name, playlist_num)

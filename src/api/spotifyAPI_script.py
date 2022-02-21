@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np 
 import json
 import time
-import spotifyAPI as spot
+import api.spotifyAPI as spot
 import math
 import os
 
