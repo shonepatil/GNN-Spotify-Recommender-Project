@@ -9,41 +9,53 @@ import numpy as np
 import json
 import time
 import spotifyAPI as spot
+import math
+import os
 
-client_id = ''
-client_secret = ''
+def round_down(x):
+    return int(math.floor(x / 100.0)) * 100
 
-spotify = spot.SpotifyAPI(client_id, client_secret)
+def pull_audio_features(num_nodes):
+    client_id = 'ad2536ed7a914d66b89b80fb3a500787'
+    client_secret = '8c5f45fb008d4bc5bf909ec46d076b65'
 
-def get_data(query, api, num):
-    chunk = api.get_resource(query, 'audio-features', 'v1')
-    json_object = json.dumps(chunk, indent = 4)
+    spotify = spot.SpotifyAPI(client_id, client_secret)
 
-    with open(f'C:/Users/Administrator/data/spotify_scrape/songset{num}.json', 'w') as outfile:
-        outfile.write(json_object)
+    os.mkdir('./data/spotify_scrape')
 
-ids_list = np.array(pd.read_csv('C:/Users/Administrator/data/170k_songs.csv')['track_uri'])
-splitted_first_half = (np.array_split(ids_list[:170000], 1700))
-splitted_second_half = list(ids_list[170000:])
-bruh = list(splitted_first_half)
-bruh.append(splitted_second_half)
+    def get_data(query, api, num):
+        chunk = api.get_resource(query, 'audio-features', 'v1')
+        json_object = json.dumps(chunk, indent = 4)
 
-def perform():
-    tracker = 0
-    for i in bruh:
-        qry = ','.join(i)
-        complete = False
-        while complete != True:
-            try:
-                get_data(qry, spotify, tracker)
-                complete = True
-            except :
-                print('http error')
-                time.sleep(60)
-                
-        tracker += 1
-        if tracker % 1000 == 0:
-            print(tracker)
-        time.sleep(10)
+        with open(f'./data/spotify_scrape/songset{num}.json', 'w') as outfile:
+            outfile.write(json_object)
 
-#perform()
+    # 460k songs has 461880 songs 106486690 edges
+    ids_list = np.array(pd.read_csv('./data/songs.csv')['track_uri'])
+    # splitted_first_half = (np.array_split(ids_list[:461800], 4618))
+    # splitted_second_half = list(ids_list[461800:])
+    splitted_first_half = (np.array_split(ids_list[:round_down(num_nodes)], num_nodes // 100))
+    splitted_second_half = list(ids_list[round_down(num_nodes):])
+    bruh = list(splitted_first_half)
+    bruh.append(splitted_second_half)
+
+    def perform():
+        tracker = 0
+        for i in range(0, len(bruh)):
+            qry = ','.join(bruh[i])
+            complete = False
+            while complete != True:
+                try:
+                    get_data(qry, spotify, tracker)
+                    complete = True
+                except :
+                    print('http error')
+                    time.sleep(60)
+                    
+            tracker += 1
+            if tracker % 1000 == 0:
+                print(tracker)
+            time.sleep(10)
+
+    perform()
+    print('Done pulling all song data from Spotify API!')

@@ -10,24 +10,48 @@ import networkx as nx
 
 import sys
 sys.path.insert(0, './src/features')
-from features.build_features import load_data as graph_from_scratch
+from build_features import load_data as graph_from_scratch
 
-def get_gpickle(data_path, dataset, pickle_path):
-    G = graph_from_scratch(data_path, dataset, 0, 0, 0)
+sys.path.insert(0, './src/api')
+from spotifyAPI_script import pull_audio_features
+from songset_processor import build_songset_csv
+
+def get_gpickle(data_path, dataset_name, pickle_path, playlist_num):
+    G = graph_from_scratch(data_path, dataset_name, playlist_num)
     nx.write_gpickle(G, pickle_path)
+    return G.number_of_nodes()
 
-def load_features(feat_dir, normalize=True):
+def load_features(feat_dir, gpickle_dir, create_graph_from_scratch, playlist_num=10000, normalize=True):
+
+    if create_graph_from_scratch:
+        num_nodes = get_gpickle('./data/playlists/', 'Spotify Playlist', gpickle_dir, playlist_num)
+
+        # Run spotify API script to create features
+        print('Pulling spotify song data using SpotifyAPI')
+        pull_audio_features(num_nodes)
+
+        print('Building songset features csv')
+        build_songset_csv(feat_dir, num_nodes)
+
+    print('Loading feature data...')
     data = np.genfromtxt(feat_dir, delimiter=',', skip_header=True, dtype=str)
-    features = np.array(np.delete(data[:,2:], -3, 1), dtype=float)
+    data = data[np.argsort(data[:, 13])]
+    features = np.array(np.delete(data[:,1:], [11, 12, 13, 14, 15], 1), dtype=float)
     if normalize:
         features = F.normalize(torch.Tensor(features), dim=0)
-    uris = data[:, 1]
+    uris = data[:, 14]
     uris = [re.sub('spotify:track:', '', uri) for uri in uris]
     uri_map = {n: i for i,n in enumerate(uris)}
-    
+    print('Feature data shape: ' + str(features.shape))
+
     return features, uri_map
 
-def load_graph(G, uri_map):
+def load_graph(gpickle_dir, uri_map):
+    print('Loading graph data...')
+
+    G = nx.read_gpickle(gpickle_dir)
+    print('Graph Info:\n', nx.info(G))
+
     src, dest = [], []
     weights = []
     for e in G.edges.data('weight'):

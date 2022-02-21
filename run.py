@@ -6,7 +6,7 @@ import json
 sys.path.insert(0, 'src/data')
 sys.path.insert(0, 'src/dgl_graphsage')
 
-from utils import load_data
+from utils import load_features, load_graph
 from train_updated import train
 
 
@@ -23,7 +23,11 @@ def main(targets):
             data_cfg = json.load(fh)
 
         # make the data target
-        feat_data, adj_list, dgl_G = load_data(**data_cfg)
+        feat_data, uri_map = load_features(data_cfg['feat_dir'], 
+            data_cfg['gpickle_dir'],
+            data_cfg['create_graph_from_scratch'], 
+            data_cfg['playlist_num'])
+        dgl_G, weights = load_graph(data_cfg['gpickle_dir'], uri_map)
 
     if 'analysis' in targets:
         with open('config/analysis-params.json') as fh:
@@ -37,7 +41,7 @@ def main(targets):
             model_cfg = json.load(fh)
     
         # make the model target
-        train(dgl_G, feat_data, adj_list, **model_cfg)
+        train(dgl_G, weights, feat_data, **model_cfg)
 
     if 'test' in targets:
         with open('config/test-data-params.json') as fh:
@@ -46,10 +50,13 @@ def main(targets):
             model_cfg = json.load(fh)
 
         # load test data
-        feat_data, adj_list, dgl_G = load_data(**data_cfg)
+        feat_data, uri_map = load_features(data_cfg['feat_dir'],
+        data_cfg['gpickle_dir'],
+        data_cfg['create_graph_from_scratch'])
+        dgl_G, weights = load_graph(data_cfg['gpickle_dir'], uri_map)
 
         # make the test target
-        train(dgl_G, feat_data, adj_list, **model_cfg)
+        train(dgl_G, weights, feat_data, **model_cfg)
 
     return
 
