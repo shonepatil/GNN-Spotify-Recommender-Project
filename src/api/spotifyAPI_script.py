@@ -16,8 +16,8 @@ def round_down(x):
     return int(math.floor(x / 100.0)) * 100
 
 def pull_audio_features(num_nodes):
-    client_id = 'ad2536ed7a914d66b89b80fb3a500787'
-    client_secret = '8c5f45fb008d4bc5bf909ec46d076b65'
+    client_id = None
+    client_secret = None
 
     spotify = spot.SpotifyAPI(client_id, client_secret)
 
