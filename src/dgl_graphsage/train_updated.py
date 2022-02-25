@@ -11,7 +11,7 @@ from sklearn.metrics import classification_report, roc_auc_score
 
 def eid_neg_sampling(G, neg_sampler):
     s, d = G.all_edges(form='uv', order='srcdst')
-    unique_idx = np.unique(s, return_index=True)[1] #index of unique nodes
+    unique_idx = np.unique(s.cpu(), return_index=True)[1] #index of unique nodes
     s, d = s[unique_idx], d[unique_idx]
     sample_eids = G.edge_ids(s, d)  
    
@@ -77,7 +77,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
     batch_per_epoch = len(train) // batch_size
     
     measures = {'epoch': [], 'loss': [], 'auc': [], 'report': []}
-    for epoch in range(2):
+    for epoch in range(10):
         for batch in range(batch_per_epoch):
             #randomly sample batch size nodes from train graph
     
@@ -136,9 +136,9 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
                 neg = pred(val_neg_g, z)
 
 
-                scores = torch.cat([pos, neg])
+                scores = torch.cat([pos, neg]).cpu()
                 labels = torch.cat(
-                    [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
+                    [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])]).cpu()
                 prediction = scores >= 0
                 
                 auc = roc_auc_score(labels, scores, average='weighted')
