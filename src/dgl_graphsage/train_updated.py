@@ -75,7 +75,9 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=0.01)
     losses = []
     batch_per_epoch = len(train) // batch_size
-    for epoch in range(1):
+    
+    measures = {'epoch': [], 'loss': [], 'auc': [], 'report': []}
+    for epoch in range(2):
         for batch in range(batch_per_epoch):
             #randomly sample batch size nodes from train graph
     
@@ -113,7 +115,7 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
 
             loss = compute_loss(pos_score, neg_score, cuda)
             losses.append(loss)
-
+            measures['loss'].append(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -128,29 +130,40 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
                 val_g = val_g.to('cuda:0')
                 val_neg_g = val_neg_g.to('cuda:0')
 
-            z = model(val_g, features[val_g.ndata[dgl.NID]], weights)
-            
-            pos = pred(val_g, z)
-            neg = pred(val_neg_g, z)
-           
-            
-            scores = torch.cat([pos, neg])
-            labels = torch.cat(
-                [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
-            prediction = scores >= 0
-            
-            print(classification_report(labels, prediction))
-            print('Epoch {} AUC: '.format(epoch+1), roc_auc_score(labels, scores, average='weighted'))
-            
-            z = model(val_g, features[val_g.ndata[dgl.NID]], weights)
-            pos = pred(val_g, z)
-            neg = pred(val_neg_g, z)
-        
-            scores = torch.cat([pos, neg]).cpu()
-            labels = torch.cat(
-                [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])]).cpu()
-            prediction = scores >= 0
-            print(classification_report(labels, prediction, zero_division=1))
-            print('Epoch {} AUC: '.format(epoch+1), roc_auc_score(labels, scores, average='weighted'))
+                z = model(val_g, features[val_g.ndata[dgl.NID]], weights)
 
-    return model, pred, losses
+                pos = pred(val_g, z)
+                neg = pred(val_neg_g, z)
+
+
+                scores = torch.cat([pos, neg])
+                labels = torch.cat(
+                    [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
+                prediction = scores >= 0
+                
+                auc = roc_auc_score(labels, scores, average='weighted')
+                report = classification_report(labels, prediction)
+                print(report)
+                print('Epoch {} AUC: '.format(epoch+1), auc)
+                measures['epoch'].append(epoch+1)
+                measures['auc'].append(auc.item())
+                measures['report'].append(report)
+            else:
+                z = model(val_g, features[val_g.ndata[dgl.NID]], weights)
+                pos = pred(val_g, z)
+                neg = pred(val_neg_g, z)
+
+                scores = torch.cat([pos, neg]).cpu()
+                labels = torch.cat(
+                    [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])]).cpu()
+                prediction = scores >= 0
+                
+                auc = roc_auc_score(labels, scores, average='weighted')
+                report = classification_report(labels, prediction, zero_division=1)
+                print(report)
+                print('Epoch {} AUC: '.format(epoch+1), auc)
+                measures['epoch'].append(epoch+1)
+                measures['auc'].append(auc.item())
+                measures['report'].append(report)
+
+    return model, pred, measures

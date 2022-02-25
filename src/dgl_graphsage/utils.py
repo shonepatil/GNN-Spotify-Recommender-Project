@@ -11,7 +11,7 @@ import networkx as nx
 import sys
 sys.path.insert(0, './src/features')
 from features.build_features import load_data as graph_from_scratch
-
+sys.path.insert(1, '..')
 sys.path.insert(0, './src/api')
 from api.spotifyAPI_script import pull_audio_features
 from api.songset_processor import build_songset_csv
