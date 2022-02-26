@@ -63,11 +63,11 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
     print('Validation pos edge: {}'.format(val_g.number_of_edges()))
     print('Cuda enabled: ' + str(cuda))
     if cuda:
-        model.cuda()
+        # model.cuda()
         pred = pred.to('cuda:0')
-        features = features.to('cuda:0')
-        train_g = train_g.to('cuda:0')
-        weights = weights.to('cuda:0')
+        # features = features.to('cuda:0')
+        # train_g = train_g.to('cuda:0')
+        # weights = weights.to('cuda:0')
     print()
     print('Training starts:')
 
@@ -77,28 +77,35 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
     batch_per_epoch = len(train) // batch_size
     
     measures = {'epoch': [], 'loss': [], 'auc': [], 'report': []}
-    for epoch in range(10):
+    print('Batches: ' + str(batch_per_epoch))
+    for epoch in range(2):
         for batch in range(batch_per_epoch):
             #randomly sample batch size nodes from train graph
     
             batch_nodes = torch.randperm(len(train))[:batch_size]  
             
             if cuda:
-                batch_nodes = batch_nodes.to('cuda:0')
+                batch_nodes = batch_nodes
             start_time = time.time()
             #Use original node ids to extract features for train graph
-            embed = model(train_g, features[train_g.ndata[dgl.NID]], weights) 
-            #construct pos and neg graph for batch
             embed = model(train_g, features[train_g.ndata[dgl.NID]], weights)
+            if cuda:
+                embed = embed.to('cuda:0')
             #construct pos and neg graph for batch
+
             src, dest = train_g.out_edges(batch_nodes, form='uv')
             src, dest = torch.cat([src, dest]), torch.cat([dest, src])
+            if cuda:
+                src = src.to('cuda:0')
+                dest = dest.to('cuda:0')
             train_pos_g = dgl.graph((src, dest), num_nodes=train_g.number_of_nodes())
             
             src_neg, dest_neg = eid_neg_sampling(train_g, neg_sampler)
-            src_neg, dest_neg = eid_neg_sampling(train_g, neg_sampler)
 
-            src_neg, dest_neg = torch.cat([src_neg, dest_neg]), torch.cat([dest_neg, src_neg])
+            src_neg, dest_neg = torch.cat([src_neg, dest_neg]), torch.cat([dest_neg, src_neg]).to('cuda:0')
+            if cuda:
+                src_neg = src_neg.to('cuda:0')
+                dest_neg = dest_neg.to('cuda:0')
             train_neg_g = dgl.graph((src_neg, dest_neg), num_nodes=train_g.number_of_nodes())
             
             if cuda:
@@ -127,13 +134,13 @@ def train(G, weights, features, cuda, feat_dim, emb_dim, test_data, k=5):
         print()
         with torch.no_grad():
             if cuda:
-                val_g = val_g.to('cuda:0')
-                val_neg_g = val_neg_g.to('cuda:0')
+                val_g = val_g
+                val_neg_g = val_neg_g
 
-                z = model(val_g, features[val_g.ndata[dgl.NID]], weights)
+                z = model(val_g, features[val_g.ndata[dgl.NID]], weights).to('cuda:0')
 
-                pos = pred(val_g, z)
-                neg = pred(val_neg_g, z)
+                pos = pred(val_g.to('cuda:0'), z)
+                neg = pred(val_neg_g.to('cuda:0'), z)
 
 
                 scores = torch.cat([pos, neg]).cpu()

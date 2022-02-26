@@ -1,0 +1,365 @@
+Loading feature data...
+Feature data shape: torch.Size([461880, 13])
+Loading graph data...
+Graph Info:
+ Name: G
+Type: Graph
+Number of nodes: 461880
+Number of edges: 106486690
+Average degree: 461.1011
+Train pos edge: 168589834
+Validation pos edge: 306960
+Cuda enabled: True
+
+Training starts:
+Batches: 82
+-----
+In epoch 1 batch 1, loss: 0.7028547525405884
+-----
+In epoch 1 batch 2, loss: 0.703698456287384
+-----
+In epoch 1 batch 3, loss: 0.7009685039520264
+-----
+In epoch 1 batch 4, loss: 0.7043822407722473
+-----
+In epoch 1 batch 5, loss: 0.6993154883384705
+-----
+In epoch 1 batch 6, loss: 0.6953598260879517
+-----
+In epoch 1 batch 7, loss: 0.6980410814285278
+-----
+In epoch 1 batch 8, loss: 0.6933950185775757
+-----
+In epoch 1 batch 9, loss: 0.6928867697715759
+-----
+In epoch 1 batch 10, loss: 0.6932908296585083
+-----
+In epoch 1 batch 11, loss: 0.6930937767028809
+-----
+In epoch 1 batch 12, loss: 0.6900195479393005
+-----
+In epoch 1 batch 13, loss: 0.6888699531555176
+-----
+In epoch 1 batch 14, loss: 0.6880424618721008
+-----
+In epoch 1 batch 15, loss: 0.685616672039032
+-----
+In epoch 1 batch 16, loss: 0.6847917437553406
+-----
+In epoch 1 batch 17, loss: 0.6813020706176758
+-----
+In epoch 1 batch 18, loss: 0.6790623664855957
+-----
+In epoch 1 batch 19, loss: 0.6763665676116943
+-----
+In epoch 1 batch 20, loss: 0.6756951808929443
+-----
+In epoch 1 batch 21, loss: 0.6664727330207825
+-----
+In epoch 1 batch 22, loss: 0.666957437992096
+-----
+In epoch 1 batch 23, loss: 0.6692487597465515
+-----
+In epoch 1 batch 24, loss: 0.6669432520866394
+-----
+In epoch 1 batch 25, loss: 0.6586586236953735
+-----
+In epoch 1 batch 26, loss: 0.653433620929718
+-----
+In epoch 1 batch 27, loss: 0.6459983587265015
+-----
+In epoch 1 batch 28, loss: 0.643891453742981
+-----
+In epoch 1 batch 29, loss: 0.62519770860672
+-----
+In epoch 1 batch 30, loss: 0.6232126355171204
+-----
+In epoch 1 batch 31, loss: 0.6193663477897644
+-----
+In epoch 1 batch 32, loss: 0.6082308888435364
+-----
+In epoch 1 batch 33, loss: 0.5913241505622864
+-----
+In epoch 1 batch 34, loss: 0.5887624621391296
+-----
+In epoch 1 batch 35, loss: 0.5777844786643982
+-----
+In epoch 1 batch 36, loss: 0.5687676072120667
+-----
+In epoch 1 batch 37, loss: 0.5429843068122864
+-----
+In epoch 1 batch 38, loss: 0.5381660461425781
+-----
+In epoch 1 batch 39, loss: 0.5349714756011963
+-----
+In epoch 1 batch 40, loss: 0.5234803557395935
+-----
+In epoch 1 batch 41, loss: 0.5181958079338074
+-----
+In epoch 1 batch 42, loss: 0.5067194104194641
+-----
+In epoch 1 batch 43, loss: 0.4955616891384125
+-----
+In epoch 1 batch 44, loss: 0.48868268728256226
+-----
+In epoch 1 batch 45, loss: 0.4857582449913025
+-----
+In epoch 1 batch 46, loss: 0.4932871162891388
+-----
+In epoch 1 batch 47, loss: 0.48851650953292847
+-----
+In epoch 1 batch 48, loss: 0.49479255080223083
+-----
+In epoch 1 batch 49, loss: 0.4946388304233551
+-----
+In epoch 1 batch 50, loss: 0.49213913083076477
+-----
+In epoch 1 batch 51, loss: 0.47527915239334106
+-----
+In epoch 1 batch 52, loss: 0.4842853844165802
+-----
+In epoch 1 batch 53, loss: 0.5041249394416809
+-----
+In epoch 1 batch 54, loss: 0.500943124294281
+-----
+In epoch 1 batch 55, loss: 0.49648213386535645
+-----
+In epoch 1 batch 56, loss: 0.48459482192993164
+-----
+In epoch 1 batch 57, loss: 0.4764178693294525
+-----
+In epoch 1 batch 58, loss: 0.48925551772117615
+-----
+In epoch 1 batch 59, loss: 0.48086345195770264
+-----
+In epoch 1 batch 60, loss: 0.4894707202911377
+-----
+In epoch 1 batch 61, loss: 0.4853099584579468
+-----
+In epoch 1 batch 62, loss: 0.48257094621658325
+-----
+In epoch 1 batch 63, loss: 0.4655510187149048
+-----
+In epoch 1 batch 64, loss: 0.47867634892463684
+-----
+In epoch 1 batch 65, loss: 0.47133198380470276
+-----
+In epoch 1 batch 66, loss: 0.47422483563423157
+-----
+In epoch 1 batch 67, loss: 0.48097386956214905
+-----
+In epoch 1 batch 68, loss: 0.4799288809299469
+-----
+In epoch 1 batch 69, loss: 0.46488767862319946
+-----
+In epoch 1 batch 70, loss: 0.46588876843452454
+-----
+In epoch 1 batch 71, loss: 0.47651761770248413
+-----
+In epoch 1 batch 72, loss: 0.46656522154808044
+-----
+In epoch 1 batch 73, loss: 0.4633728563785553
+-----
+In epoch 1 batch 74, loss: 0.4615059792995453
+-----
+In epoch 1 batch 75, loss: 0.45784109830856323
+-----
+In epoch 1 batch 76, loss: 0.48085448145866394
+-----
+In epoch 1 batch 77, loss: 0.4783821702003479
+-----
+In epoch 1 batch 78, loss: 0.47203466296195984
+-----
+In epoch 1 batch 79, loss: 0.47691717743873596
+-----
+In epoch 1 batch 80, loss: 0.47700753808021545
+-----
+In epoch 1 batch 81, loss: 0.47719812393188477
+-----
+In epoch 1 batch 82, loss: 0.47174885869026184
+
+              precision    recall  f1-score   support
+
+         0.0       0.60      0.88      0.71    160920
+         1.0       0.92      0.70      0.79    306960
+
+    accuracy                           0.76    467880
+   macro avg       0.76      0.79      0.75    467880
+weighted avg       0.81      0.76      0.76    467880
+
+Epoch 1 AUC:  0.8528519428470682
+-----
+In epoch 2 batch 1, loss: 0.45916062593460083
+-----
+In epoch 2 batch 2, loss: 0.4849226176738739
+-----
+In epoch 2 batch 3, loss: 0.4703923463821411
+-----
+In epoch 2 batch 4, loss: 0.470655620098114
+-----
+In epoch 2 batch 5, loss: 0.4524405300617218
+-----
+In epoch 2 batch 6, loss: 0.467844694852829
+-----
+In epoch 2 batch 7, loss: 0.4734708070755005
+-----
+In epoch 2 batch 8, loss: 0.46125391125679016
+-----
+In epoch 2 batch 9, loss: 0.4417952001094818
+-----
+In epoch 2 batch 10, loss: 0.46768784523010254
+-----
+In epoch 2 batch 11, loss: 0.4552268981933594
+-----
+In epoch 2 batch 12, loss: 0.4662102162837982
+-----
+In epoch 2 batch 13, loss: 0.46868184208869934
+-----
+In epoch 2 batch 14, loss: 0.453190416097641
+-----
+In epoch 2 batch 15, loss: 0.45374050736427307
+-----
+In epoch 2 batch 16, loss: 0.45732519030570984
+-----
+In epoch 2 batch 17, loss: 0.459358274936676
+-----
+In epoch 2 batch 18, loss: 0.4646223485469818
+-----
+In epoch 2 batch 19, loss: 0.47521159052848816
+-----
+In epoch 2 batch 20, loss: 0.48234543204307556
+-----
+In epoch 2 batch 21, loss: 0.4781548082828522
+-----
+In epoch 2 batch 22, loss: 0.467430979013443
+-----
+In epoch 2 batch 23, loss: 0.46169543266296387
+-----
+In epoch 2 batch 24, loss: 0.4648081660270691
+-----
+In epoch 2 batch 25, loss: 0.4658440053462982
+-----
+In epoch 2 batch 26, loss: 0.4638114869594574
+-----
+In epoch 2 batch 27, loss: 0.47006499767303467
+-----
+In epoch 2 batch 28, loss: 0.4685831367969513
+-----
+In epoch 2 batch 29, loss: 0.46032482385635376
+-----
+In epoch 2 batch 30, loss: 0.465360552072525
+-----
+In epoch 2 batch 31, loss: 0.4630066156387329
+-----
+In epoch 2 batch 32, loss: 0.4753972589969635
+-----
+In epoch 2 batch 33, loss: 0.4680303633213043
+-----
+In epoch 2 batch 34, loss: 0.4685027599334717
+-----
+In epoch 2 batch 35, loss: 0.4478466808795929
+-----
+In epoch 2 batch 36, loss: 0.45598724484443665
+-----
+In epoch 2 batch 37, loss: 0.4479893445968628
+-----
+In epoch 2 batch 38, loss: 0.46084317564964294
+-----
+In epoch 2 batch 39, loss: 0.4691101014614105
+-----
+In epoch 2 batch 40, loss: 0.4619148075580597
+-----
+In epoch 2 batch 41, loss: 0.4621345102787018
+-----
+In epoch 2 batch 42, loss: 0.4531371295452118
+-----
+In epoch 2 batch 43, loss: 0.4613098204135895
+-----
+In epoch 2 batch 44, loss: 0.4569530785083771
+-----
+In epoch 2 batch 45, loss: 0.46012574434280396
+-----
+In epoch 2 batch 46, loss: 0.4420328438282013
+-----
+In epoch 2 batch 47, loss: 0.4662203788757324
+-----
+In epoch 2 batch 48, loss: 0.4618217945098877
+-----
+In epoch 2 batch 49, loss: 0.45891472697257996
+-----
+In epoch 2 batch 50, loss: 0.44840750098228455
+-----
+In epoch 2 batch 51, loss: 0.4677866995334625
+-----
+In epoch 2 batch 52, loss: 0.45974600315093994
+-----
+In epoch 2 batch 53, loss: 0.46277621388435364
+-----
+In epoch 2 batch 54, loss: 0.45161235332489014
+-----
+In epoch 2 batch 55, loss: 0.4746442437171936
+-----
+In epoch 2 batch 56, loss: 0.4484279751777649
+-----
+In epoch 2 batch 57, loss: 0.46025288105010986
+-----
+In epoch 2 batch 58, loss: 0.46107348799705505
+-----
+In epoch 2 batch 59, loss: 0.4611593186855316
+-----
+In epoch 2 batch 60, loss: 0.4563711881637573
+-----
+In epoch 2 batch 61, loss: 0.4548370838165283
+-----
+In epoch 2 batch 62, loss: 0.45802855491638184
+-----
+In epoch 2 batch 63, loss: 0.4642270505428314
+-----
+In epoch 2 batch 64, loss: 0.44916772842407227
+-----
+In epoch 2 batch 65, loss: 0.4623696506023407
+-----
+In epoch 2 batch 66, loss: 0.4601467549800873
+-----
+In epoch 2 batch 67, loss: 0.4725904166698456
+-----
+In epoch 2 batch 68, loss: 0.4583559036254883
+-----
+In epoch 2 batch 69, loss: 0.46818214654922485
+-----
+In epoch 2 batch 70, loss: 0.460682213306427
+-----
+In epoch 2 batch 71, loss: 0.4452171325683594
+-----
+In epoch 2 batch 72, loss: 0.4466361999511719
+-----
+In epoch 2 batch 73, loss: 0.4532051682472229
+-----
+In epoch 2 batch 74, loss: 0.4588559567928314
+-----
+In epoch 2 batch 75, loss: 0.4717482626438141
+-----
+In epoch 2 batch 76, loss: 0.45608529448509216
+-----
+In epoch 2 batch 77, loss: 0.4491848647594452
+-----
+In epoch 2 batch 78, loss: 0.4488331377506256
+-----
+In epoch 2 batch 79, loss: 0.4624229967594147
+-----
+In epoch 2 batch 80, loss: 0.4563153386116028
+-----
+In epoch 2 batch 81, loss: 0.44600316882133484
+-----
+In epoch 2 batch 82, loss: 0.4524829387664795
+
+              precision    recall  f1-score   support
+
+         0.0       0.65      0.82      0.72    160920
+         1.0       0.89      0.77      0.82    306960
+
+    accuracy                           0.78    467880
+   macro avg       0.77      0.79      0.77    467880
+weighted avg       0.81      0.78      0.79    467880
+
+Epoch 2 AUC:  0.8710841410646761

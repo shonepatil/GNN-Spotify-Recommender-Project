@@ -1,6 +1,6 @@
 {
-    "feat_dir": "./data/a13group1/features/songset_features.csv",
-    "gpickle_dir": "./data/a13group1/graph_170k.gpickle",
+    "feat_dir": "./data/a13group1/460k_songset_features.csv",
+    "gpickle_dir": "./data/a13group1/graph_460k.gpickle",
     "create_graph_from_scratch": false,
     "playlist_num": 10000
 }

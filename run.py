@@ -8,7 +8,7 @@ sys.path.insert(0, 'src/dgl_graphsage')
 
 from utils import load_features, load_graph
 from train_updated import train
-
+import torch
 
 def main(targets):
     '''
@@ -41,7 +41,7 @@ def main(targets):
             model_cfg = json.load(fh)
     
         # make the model target
-        train(dgl_G, weights, feat_data, **model_cfg)
+        model, pred, measures = train(dgl_G, weights, feat_data, **model_cfg)
 
     if 'test' in targets:
         with open('config/test-data-params.json') as fh:
