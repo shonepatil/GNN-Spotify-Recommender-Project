@@ -7,6 +7,8 @@ from torch.nn.functional import normalize
 import torch
 import dgl
 import networkx as nx
+from train_updated import eid_neg_sampling
+from sklearn.metrics import precision_recall_fscore_support, classification_report, roc_auc_score
 
 import sys
 sys.path.insert(0, './src/features')
@@ -115,7 +117,8 @@ def edge_coordinate(batch_nodes, adj_list, neg=False):
     
     return src, dest
 
-def metrics(dgl_G, target_set):
+def metrics(dgl_G, target_set, model, pred, feat_data):
+    weights = dgl_G.edata['weights']
     neg_sampler = dgl.dataloading.negative_sampler.Uniform(k=5)
     
     g = dgl.node_subgraph(dgl_G, target_set)
@@ -123,10 +126,10 @@ def metrics(dgl_G, target_set):
     
     s_neg, d_neg = eid_neg_sampling(g, neg_sampler)
     s_neg, d_neg = torch.cat([s_neg, d_neg]), torch.cat([d_neg, s_neg])
-    neg_g = dgl.graph((s_neg, td_neg), num_nodes=g.number_of_nodes())
+    neg_g = dgl.graph((s_neg, d_neg), num_nodes=g.number_of_nodes())
     
-    pos = pred(test_g, test_embeddings)
-    neg = pred(test_neg_g, test_embeddings)
+    pos = pred(g, embeddings)
+    neg = pred(neg_g, embeddings)
 
     scores = torch.cat([pos, neg]).detach().numpy()
     labels = torch.cat(
