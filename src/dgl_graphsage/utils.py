@@ -114,3 +114,27 @@ def edge_coordinate(batch_nodes, adj_list, neg=False):
     dest = [n for v in neigh_dict.values() for n in v]
     
     return src, dest
+
+def metrics(dgl_G, target_set):
+    neg_sampler = dgl.dataloading.negative_sampler.Uniform(k=5)
+    
+    g = dgl.node_subgraph(dgl_G, target_set)
+    embeddings = model(g, feat_data[g.ndata[dgl.NID]], weights)
+    
+    s_neg, d_neg = eid_neg_sampling(g, neg_sampler)
+    s_neg, d_neg = torch.cat([s_neg, d_neg]), torch.cat([d_neg, s_neg])
+    neg_g = dgl.graph((s_neg, td_neg), num_nodes=g.number_of_nodes())
+    
+    pos = pred(test_g, test_embeddings)
+    neg = pred(test_neg_g, test_embeddings)
+
+    scores = torch.cat([pos, neg]).detach().numpy()
+    labels = torch.cat(
+                [torch.ones(pos.shape[0]), torch.zeros(neg.shape[0])])
+    prediction = scores >= 0
+
+    auc = roc_auc_score(labels, scores, average='weighted')
+    report = classification_report(labels, prediction, zero_division=1)
+    precision, recall, f_score = precision_recall_fscore_support(labels, prediction, average='weighted')
+    
+    return auc, precision, recall, f_score, report
