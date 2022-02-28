@@ -224,6 +224,49 @@ def recommend(seeds, dgl_G, z, pred, neigh, feat_data, uri_map):
         
     return uri_recs
 
+def recommend_no_repeat(seeds, dgl_G, z, pred, neigh, feat_data, uri_map):
+
+    listed = list(uri_map) #parse through uri map for uri --> integer
+
+    score_dict = defaultdict(dict)
+    uri_recs = []
+    for s in seeds:
+        s = uri_map[s]
+        _, candidates = dgl_G.out_edges(s, form='uv')
+        s_embed = z[s].unsqueeze(dim=0)
+        edge_embeds = [torch.cat([s_embed, z[c.item()].unsqueeze(dim=0)],1) for c in candidates]
+        #print('Node Value:', s, 'Possible Recs:', len(edge_embeds))
+        edge_embeds = torch.cat(edge_embeds, 0)
+        scores = pred.W2(F.relu(pred.W1(edge_embeds))).squeeze(1)
+        val = list(zip(candidates.detach().numpy(), scores.detach().numpy()))
+        val.sort(key=lambda x:x[1], reverse=True)
+        
+        
+        # Make sure the song is not already in the playlist or recommendations
+        inc = 0       
+        while True and inc < len(val):
+            cur_uri = listed[val[inc][0]]
+            if cur_uri not in seeds and cur_uri not in uri_recs:
+                score_dict[s] = val[inc][0]
+                uri_recs.append(cur_uri)
+                break
+            
+            if not set(candidates)^set(uri_recs) or inc == (len(val) - 1):
+                # If no co-occurence, use 5-NN based on features -- COLD START
+                # print('Cold Start, Using Feature Data Instead')
+                closest = neigh.kneighbors(feat_data[[s]], 5, return_distance=False)[0]
+                for i in closest:
+                    if listed[i] not in seeds:
+                        score_dict[s] = i
+                        uri_recs.append(cur_uri)
+                        break
+                break
+                    
+            else:
+                inc += 1     
+    
+    return uri_recs
+
 def get_data_spotify(query, api, num):
     chunk = api.get_resource(query, 'tracks', 'v1')
     return chunk
