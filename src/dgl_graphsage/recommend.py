@@ -11,7 +11,6 @@ import numpy as np
 
 sys.path.insert(1, '..')
 from api.spotifyAPI import SpotifyAPI
-from utils import load_graph
 from train_updated import train
 
 import dgl
