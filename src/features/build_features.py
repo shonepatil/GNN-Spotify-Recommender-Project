@@ -79,16 +79,17 @@ def build_graph_from_scratch(path, n = 10000):
     # print(sorted(G.edges(data=True),key= lambda x: x[2]['weight'],reverse=True)[:5])
 
     # Dump to csv
-    nx.write_edgelist(G, "./data/10k_edgelist.csv", data=["weight"])
+    nx.write_edgelist(G, "./data/170k_edgelist.csv", data=["weight"])
 
     return G
 
 # Create node2vec embeddings
 def create_node2vec_embeddings(G):
     # Get Node Features Matrix (X)
-    X_start = pd.read_csv('./data/a13group1/features/merged_features.csv')
-    uris = [i[14:] for i in X_start['track_uri']]
-    X = X_start.iloc[:, 2:].drop(['type'], axis=1).values
+    # X_start = pd.read_csv('./data/a13group1/features/merged_features.csv')
+    # uris = [i[14:] for i in X_start['track_uri']]
+    # X = X_start.iloc[:, 2:].drop(['type'], axis=1).values
+    uris = sorted(G.nodes())
 
     # Set up Node2Vec Embeddings
     if include_node2vec:
@@ -101,7 +102,8 @@ def create_node2vec_embeddings(G):
         n2v = Node2Vec(graph, dim=32, walk_length=10, context=10, p=2.0, q=0.5, workers=4, seed=10)
         n2v.train(epochs=200, progress_bar=True)
         emb = [n2v.wv[node] for node in uris]
-        X = np.c_[X, np.array(emb)].astype(float)
+        # X = np.c_[X, np.array(emb)].astype(float)
+        X = np.array(emb)
 
     # Standardize X
     scaler = StandardScaler()
