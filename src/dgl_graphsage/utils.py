@@ -1,4 +1,5 @@
 import re
+import random
 import numpy as np
 from collections import defaultdict
 import torch.nn.functional as F
@@ -7,6 +8,8 @@ from torch.nn.functional import normalize
 import torch
 import dgl
 import networkx as nx
+import json
+from recommend import recommend_no_repeat
 from sklearn.metrics import precision_recall_fscore_support, classification_report, roc_auc_score
 
 import sys
@@ -140,3 +143,49 @@ def metrics(dgl_G, target_set, model, pred, feat_data):
     precision, recall, f_score = precision_recall_fscore_support(labels, prediction, average='weighted')
     
     return auc, precision, recall, f_score, report
+
+def r_precision(tracks, dgl_G, z, pred, neigh, feat_data, uri_map):
+    seed_len = len(tracks)//2
+    seeds = tracks[:seed_len]
+    masked = tracks[seed_len:]
+    rec_uris = recommend_no_repeat(seeds, dgl_G, z, pred, neigh, feat_data, uri_map)
+    relevant = len(set(masked).intersection(set(uri_recs)))
+    r = relevant / len(masked)
+    return r
+
+
+def r_precision_analysis(total, start, end, dgl_G, z, pred, neigh, feat_data, uri_map, data_dir):
+    start, end = 20000, start+1000
+    total = 50000
+    rs = []
+    seed_size = []
+    ks = []
+    avg_deg = []
+        
+    while end != total+1000:
+        slice_path = data_dir+'/mpd.slice.%s.json'%(str(start)+'-'+str(end-1))
+        with open(slice_path, 'r') as f:
+            mpd_slice = json.load(f)
+        playlists = mpd_slice['playlists']
+        print('playlist %s'%(str(start)+'-'+str(end-1)))
+        for i in range(50):
+            k = random.randint(0, len(playlists))
+            ks.append(k)
+            tracks = pd.DataFrame(playlists[k]['tracks'])
+            track_uris = tracks['track_uri'].apply(lambda x: re.sub('spotify:track:', '', x))
+
+            seed_len = len(track_uris)//2
+            seeds = track_uris[:seed_len]
+            masked = track_uris[seed_len:]
+            seed_ids = [uri_map[i] for i in seeds]
+            avg_deg.append(np.mean([dgl_G.out_degrees(i) for i in seed_ids]))
+
+            uri_recs = recommend_no_repeat(seeds, dgl_G, z, pred, neigh, feat_data, uri_map)
+            relevant = len(set(masked).intersection(set(uri_recs)))
+            r = relevant / len(masked)
+            print('k={}, seed_size={}, r={}'.format(k, seed_len, r))
+            rs.append(r)
+            seed_size.append(seed_len)
+        start+=1000
+        end+=1000
+        print()
